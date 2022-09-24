@@ -48,7 +48,7 @@ async function main() {
       // useFindAndModify: true,
     });
   } catch (e) {
-    return res.status(ErrorServer).send({ message: "Произошла ошибка" });
+    res.status(ErrorServer).send({ message: "Произошла ошибка" });
   }
 
   app.listen(PORT);
