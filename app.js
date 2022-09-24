@@ -4,23 +4,14 @@ const mongoose = require("mongoose");
 
 const path = require("path");
 
-
-
 const { PORT = 3000 } = process.env;
 
 const { UserRoutes } = require("./routes/users");
 const { CardRoutes } = require("./routes/cards");
 
-const {
-  ErrorNot,
-  ErrorServer,
-  ErrorBad,
-} = require('./utils/errors')
+const { ErrorNot, ErrorServer, ErrorBad } = require("./utils/errors");
 
 const app = express();
-
-
-
 
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -29,12 +20,9 @@ app.use("/", (req, res, next) => {
   next();
 });
 
-
-
-
 app.use((req, res, next) => {
   req.user = {
-    _id: '632e377e65f557201977c91e' // вставьте сюда _id созданного в предыдущем пункте пользователя
+    _id: "632e377e65f557201977c91e", // вставьте сюда _id созданного в предыдущем пункте пользователя
   };
 
   next();
