@@ -1,6 +1,6 @@
 Репозиторий проекта
-Ссылка на репозиторий проекта:
-https://github.com/Ne-skrooomnaya/express-mesto-gha
+
+Ссылка на репозиторий проекта: https://github.com/Ne-skrooomnaya/express-mesto-gha
 
 Проект представляет собой серверную часть (backend) для интерактивной страницы Mesto.
 
