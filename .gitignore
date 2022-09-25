@@ -5,9 +5,9 @@ npm-debug.log*
 
 # Dependency directory
 node_modules
-# public
+public
 # build
-# .eslintrc.js
+.eslintrc.js
 
 # Optional npm cache directory
 .npm
