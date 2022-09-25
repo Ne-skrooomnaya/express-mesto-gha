@@ -34,7 +34,7 @@ async function main() {
   try {
     await mongoose.connect("mongodb://localhost:27017/mestodb", {
       useNewUrlParser: true,
-      useUnifiedTopology: false,
+      useUnifiedTopology: true,
     });
     await app.listen(PORT);
     console.log(`Сервер запущен на ${PORT} порту`);
