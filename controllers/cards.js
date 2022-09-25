@@ -7,7 +7,7 @@ const getCards = async (req, res) => {
     const cards = await Card.find({});
     res.status(200).send(cards);
   } catch (err) {
-    res.status(ErrorServer).send({ message: "Произошла ошибка", ...err });
+    res.status(ErrorServer).send({ message: "Произошла ошибка" });
   }
 };
 

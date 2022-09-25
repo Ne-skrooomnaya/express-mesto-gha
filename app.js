@@ -33,9 +33,7 @@ app.use((req, res) => {
   res.status(ErrorNot).send({ message: "Произошла ошибка" });
 });
 
-app.listen(PORT, () => {
-  console.log(`Сервер запущен на ${PORT} порту`);
-});
+app.listen(PORT, () => console.log(`Server started at port: ${PORT}`));
 
 // function main() {
 //   try {
