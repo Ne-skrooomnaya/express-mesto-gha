@@ -1,11 +1,7 @@
 const http = require("http");
 const hostname = "127.0.0.1";
 const PORT = 3000;
-const server = http.createServer((req, res) => {
-  res.statusCode = 200;
-  res.setHeader("Content-Type", "text / plain");
-  res.end("Hello World");
-});
+
 
 const express = require("express");
 
@@ -44,13 +40,19 @@ app.use(CardRoutes);
 
 // app.listen(PORT, () => console.log(`Server started at port: ${PORT}`));
 
+const server = http.createServer((req, res, next) => {
+  res.statusCode = 200;
+  res.setHeader("Content-Type", "text / plain");
+  res.end("Hello World");
+});
+
 async function main() {
   try {
-    await mongoose.connect("mongodb://localhost:27017/mestodb", {
+      mongoose.connect("mongodb://localhost:27017/mestodb", {
       useNewUrlParser: true,
       useUnifiedTopology: false,
     });
-    await server.listen(PORT, () => {
+    server.listen(PORT, () => {
       console.log(`Сервер работает по адресу http: // ${hostname}: ${PORT} /`);
     });
   } catch (err) {
