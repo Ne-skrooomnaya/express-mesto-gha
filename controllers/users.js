@@ -1,5 +1,6 @@
+/* eslint-disable import/no-unresolved */
 /* eslint-disable consistent-return */
-const User = require('../models/user');
+const User = require('../models/User');
 const { ErrorNot, ErrorServer, ErrorBad } = require('../utils/errors');
 
 const getUsers = async (req, res) => {

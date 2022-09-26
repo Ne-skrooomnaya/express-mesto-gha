@@ -1,10 +1,10 @@
+/* eslint-disable import/no-unresolved */
 /* eslint-disable no-else-return */
 /* eslint-disable consistent-return */
-/* eslint-disable import/extensions */
-/* eslint-disable import/no-unresolved */
+
 const mongoose = require('mongoose');
-const Card = require('../models/card');
-const { ErrorNot, ErrorServer, ErrorBad } = require('../utils/errors.js');
+const Card = require('../models/Card');
+const { ErrorNot, ErrorServer, ErrorBad } = require('../utils/errors');
 
 const getCards = async (req, res) => {
   const cards = Card.find({});
