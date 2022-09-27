@@ -3,14 +3,10 @@
 const User = require('../models/User');
 const { ErrorNot, ErrorServer, ErrorBad } = require('../utils/errors');
 
-const getUsers = async (req, res) => {
-  // const users = User.find({});
-  try {
-    const users = User.find({});
-    res.status(200).send(users);
-  } catch (err) {
-    res.status(ErrorServer).send({ message: 'Произошла ошибка', ...err });
-  }
+const getUsers = (req, res, next) => {
+  User.find({})
+    .then((users) => res.status(200).send(users))
+    .catch(next);
 };
 // await
 
@@ -18,17 +14,30 @@ const getUserId = async (req, res) => {
   const { id } = req.params;
   try {
     const user = User.findById(id);
-
     if (!user) {
-      res
-        .status(ErrorNot)
-        .send({ message: 'Такого пользователя не существует' });
+      res.status(ErrorNot).send({ message: 'Такого пользователя не существует' });
     }
     res.status(200).send(user);
   } catch (err) {
     res.status(ErrorServer).send({ message: 'Произошла ошибка c id', ...err });
   }
 };
+
+// User.findById(req.params.userId)
+// .then((user) => {
+//   if (!user) {
+//     throw new ErrorNot('Пользователь не найден');
+//   }
+//   res.send(user);
+// })
+// .catch((err) => {
+//   if (err.name === 'CastError') {
+//     next(new ErrorBad(`Ошибка валидации: ${err.message}`));
+//   } else {
+//     next(err);
+//   }
+// });
+// };
 
 const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
@@ -85,7 +94,6 @@ const updateUserAvatar = async (req, res) => {
         .status(ErrorBad)
         .send({
           message: 'Переданы некорректные данные при создании пользователя.',
-          ...err,
         });
     }
     res.status(ErrorServer).send({ message: 'Произошла ошибка', ...err });

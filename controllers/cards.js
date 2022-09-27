@@ -6,14 +6,10 @@ const mongoose = require('mongoose');
 const Card = require('../models/Card');
 const { ErrorNot, ErrorServer, ErrorBad } = require('../utils/errors');
 
-const getCards = async (req, res) => {
-  const cards = Card.find({});
-  try {
-    // const cards = Card.find({});
-    res.status(200).send(cards);
-  } catch (err) {
-    res.status(ErrorServer).send({ message: 'Произошла ошибка' });
-  }
+const getCards = (req, res, next) => {
+  Card.find({})
+    .then((cards) => res.status(200).send({ data: cards }))
+    .catch(next);
 };
 // await
 const DeleteCardId = async (req, res) => {
