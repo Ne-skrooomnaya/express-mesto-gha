@@ -8,7 +8,7 @@ const {
 CardRoutes.post('/cards', express.json(), createCard);
 CardRoutes.get('/cards', express.json(), getCards);
 CardRoutes.delete('/cards/:id', express.json(), DeleteCardId);
-CardRoutes.put('/cards/:Id/likes', express.json(), likeCard);
-CardRoutes.delete('/cards/:Id/likes', express.json(), dislikeCard);
+CardRoutes.put('/cards/:id/likes', express.json(), likeCard);
+CardRoutes.delete('/cards/:id/likes', express.json(), dislikeCard);
 
 module.exports = CardRoutes;
