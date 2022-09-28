@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable import/no-unresolved */
 /* eslint-disable no-else-return */
 /* eslint-disable consistent-return */
@@ -6,18 +7,24 @@
 const Card = require('../models/Card');
 const { ErrorNot, ErrorServer, ErrorBad } = require('../utils/errors');
 
-const getCards = (req, res, next) => {
+const getCards = (req, res) => {
   Card.find({})
     .then((cards) => res.status(200).send({ data: cards }))
-    .catch(next);
+    .catch((err) => res.status(ErrorServer).send({ message: 'Ошибка на сервере', ...err }));
 };
 
-const createCard = (req, res) => {
+const createCard = async (req, res) => {
   const { name, link } = req.body;
   const owner = req.user._id;
-  Card.create({ name, link, owner })
-    .then((user) => res.send({ data: user }))
-    .catch((err) => res.status(ErrorBad).send({ message: 'Переданы некорректные данные при создании пользователя.', ...err }));
+  try {
+    const card = await Card.create({ name, link, owner });
+    return res.send({ data: card });
+  } catch (err) {
+    if (err.name === 'ValidationError') {
+      res.status(ErrorBad).send({ message: 'Ошибка валидации' });
+    }
+  }
+  res.status(ErrorServer).send({ message: 'Ошибка на сервере' });
 };
 
 const DeleteCardId = async (req, res) => {
@@ -53,43 +60,41 @@ const DeleteCardId = async (req, res) => {
 //   }
 // }
 
-const likeCard = (req, res, next) => {
+const likeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.id,
     { $addToSet: { likes: req.user._id } },
     { new: true },
   ).then((card) => {
     if (!card) {
-      res.status(ErrorNot).send({ message: 'Карточка с указанным _id не найдена.' });
+      return res.status(ErrorNot).send({ message: 'Карточка с указанным _id не найдена.' });
       // throw new ErrorNot('Карточка не найдена');
     }
     res.status(200).send({ card });
   }).catch((err) => {
     if (err.name === 'ValidationError' || err.name === 'CastError') {
-      res.status(ErrorBad).send({ message: 'Переданы некорректные данные при создании пользователя.', ...err });
-    } else {
-      next(err);
+      return res.status(ErrorBad).send({ message: 'Переданы некорректные данные при создании пользователя.', ...err });
     }
+    return res.status(ErrorServer).send({ message: 'ошибка сервера' });
   });
 };
 
-const dislikeCard = (req, res, next) => {
+const dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.id,
     { $pull: { likes: req.user._id } },
     { new: true },
   ).then((card) => {
     if (!card) {
-      res.status(ErrorNot).send({ message: 'Карточка с указанным _id не найдена.' });
+      return res.status(ErrorNot).send({ message: 'Карточка с указанным _id не найдена.' });
       // throw new ErrorNot('Карточка не найдена');
     }
     res.status(200).send({ data: card });
   }).catch((err) => {
     if (err.name === 'CastError') {
       res.status(ErrorBad).send({ message: 'Переданы некорректные данные при создании пользователя.', ...err });
-    } else {
-      next(err);
     }
+    return res.status(ErrorServer).send({ message: 'ошибка сервера' });
   });
 };
 
