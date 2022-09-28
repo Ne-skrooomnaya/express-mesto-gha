@@ -18,7 +18,7 @@ const DeleteCardId = async (req, res) => {
     if (!card) {
       return res.status(ErrorNot).send({ message: 'Карточка с указанным _id не найдена.' });
     }
-    return res.send({ message: 'карточка удалена' });
+    return res.status(200).send({ message: 'карточка удалена' });
   } catch (err) {
     if (err.name === 'CastError') {
       return res.status(ErrorBad).send({ message: 'Переданы некорректные данные при удалении карточки.' });

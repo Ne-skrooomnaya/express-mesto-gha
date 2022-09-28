@@ -20,11 +20,9 @@ const getUserId = async (req, res) => {
     res.status(200).send(user);
   } catch (err) {
     if (err.name === 'CastError') {
-      res.status(ErrorBad).send({ message: 'Такого пользователя не существует 2' });
-      // return next(new ErrorBad('Ошибка валидации'));
+      res.status(ErrorBad).send({ message: 'Ошибка валидации' });
     }
-    res.status(ErrorServer).send({ message: 'Такого пользователя не существует 3' });
-    // return next(new ErrorServer('Ошибка на сервере'));
+    res.status(ErrorServer).send({ message: 'Ошибка на сервере' });
   }
 };
 
@@ -38,28 +36,22 @@ const createUser = (req, res) => {
 
 const updateUserInfo = async (req, res) => {
   const { name, about } = req.body;
+  const owner = req.user._id;
   try {
-    const user = User.findByIdAndUpdate(
-      req.user._id,
+    const user = await User.findByIdAndUpdate(
+      owner,
       { name, about },
       { new: true, runValidators: true },
     );
     if (!user) {
-      return res
-        .status(ErrorNot)
-        .send({ message: 'Такого пользователя не существует' });
+      return res.status(ErrorNot).send({ message: 'Такого пользователя не существует' });
     }
     res.status(200).send(user);
   } catch (err) {
-    if (err.name === 'ValidationError') {
-      return res
-        .status(ErrorBad)
-        .send({
-          message: 'Переданы некорректные данные при создании пользователя.',
-          ...err,
-        });
+    if (err.owner === 'ValidationError') {
+      return res.status(ErrorBad).send({ message: 'Переданы некорректные данные при создании пользователя.' });
     }
-    res.status(ErrorServer).send({ message: 'Произошла ошибка', ...err });
+    return res.status(ErrorServer).send({ message: 'Произошла ошибка' });
   }
 };
 
