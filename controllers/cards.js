@@ -21,8 +21,9 @@ const createCard = (req, res) => {
 };
 
 const DeleteCardId = async (req, res) => {
+  const { id } = req.params;
   try {
-    const card = Card.findByIdAndRemove(req.params.id);
+    const card = await Card.findByIdAndRemove(id);
     if (!card) {
       return res.status(ErrorNot).send({ message: 'Карточка с указанным _id не найдена.' });
     }
@@ -82,15 +83,29 @@ const dislikeCard = (req, res, next) => {
       res.status(ErrorNot).send({ message: 'Карточка с указанным _id не найдена.' });
       // throw new ErrorNot('Карточка не найдена');
     }
-    res.status(200).send({ card });
+    res.status(200).send({ data: card });
   }).catch((err) => {
-    if (err.name === 'ValidationError' || err.name === 'CastError') {
+    if (err.name === 'CastError') {
       res.status(ErrorBad).send({ message: 'Переданы некорректные данные при создании пользователя.', ...err });
     } else {
       next(err);
     }
   });
 };
+
+//   ).then((card) => {
+//     if (!card) {
+//       throw new ErrorNot('Карточка не найдена');
+//     }
+//     res.status(200).send({ data: card });
+//   }).catch((err) => {
+//     if (err.name === 'CastError') {
+//       next(new ErrorBad(`Ошибка валидации: ${err.message}`));
+//     } else {
+//       next(err);
+//     }
+//   });
+// };
 
 module.exports = {
   getCards,
