@@ -11,15 +11,15 @@ const getUsers = (req, res, next) => {
 // await
 
 const getUserId = async (req, res) => {
-  // const { id } = req.params;
+  const { id } = req.params;
   try {
-    const user = await User.findById(req.user.id);
-    if (user) {
+    const user = await User.findById(id);
+    if (!user) {
       res.status(ErrorNot).send({ message: 'Такого пользователя не существует' });
     }
     res.status(200).send(user);
   } catch (err) {
-    res.status(ErrorBad).send({ message: 'Произошла ошибка c id', ...err });
+    res.status(ErrorServer).send({ message: 'Произошла ошибка c id', ...err });
   }
 };
 
