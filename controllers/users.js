@@ -15,11 +15,16 @@ const getUserId = async (req, res) => {
   try {
     const user = await User.findById(id);
     if (!user) {
-      res.status(ErrorNot).send({ message: 'Такого пользователя не существует' });
+      res.status(ErrorNot).send({ message: 'Такого пользователя не существует 1' });
     }
     res.status(200).send(user);
   } catch (err) {
-    res.status(ErrorBad.send({ message: 'Произошла ошибка c id', ...err }));
+    if (err.name === 'CastError') {
+      res.status(ErrorBad).send({ message: 'Такого пользователя не существует 2' });
+      // return next(new ErrorBad('Ошибка валидации'));
+    }
+    res.status(ErrorServer).send({ message: 'Такого пользователя не существует 3' });
+    // return next(new ErrorServer('Ошибка на сервере'));
   }
 };
 
