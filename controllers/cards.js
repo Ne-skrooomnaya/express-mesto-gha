@@ -32,7 +32,7 @@ const createCard = async (req, res) => {
   const owner = req.user._id;
   try {
     const card = Card.create({ name, link, owner });
-    return res.send(card);
+    return res.send(card.id);
   } catch (err) {
     if (err.name === 'ValidationError') {
       return res.status(ErrorBad).send({ message: 'Переданы некорректные данные при создании карточки.' });
