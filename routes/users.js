@@ -8,7 +8,7 @@ const {
 UserRoutes.post('/users', express.json(), createUser);
 UserRoutes.get('/users', express.json(), getUsers);
 UserRoutes.get('/users/:id', express.json(), getUserId);
-UserRoutes.patch('/me', express.json(), updateUserInfo);
-UserRoutes.patch('/me/avatar', express.json(), updateUserAvatar);
+UserRoutes.patch('/users/me', express.json(), updateUserInfo);
+UserRoutes.patch('/users/me/avatar', express.json(), updateUserAvatar);
 
 module.exports = UserRoutes;
