@@ -37,7 +37,7 @@ const DeleteCardId = async (req, res) => {
 
 // function searchResultHandler(res, card) {
 //   if (!card) {
-//     return res.status(ErrorNot).send({ message: 'Карточка с указанным _id не найдена.' });
+// return res.status(ErrorNot).send({ message: 'Карточка с указанным _id не найдена.' });
 //   }
 //   res.status(200).send(card);
 //   res.status(ErrorServer).send({ message: 'Произошла ошибка на сервере' });
@@ -59,9 +59,10 @@ const likeCard = (req, res, next) => {
     { new: true },
   ).then((card) => {
     if (!card) {
-      throw new ErrorNot('Карточка не найдена');
+      res.status(ErrorNot).send({ message: 'Карточка с указанным _id не найдена.' });
+      // throw new ErrorNot('Карточка не найдена');
     }
-    res.status(200).send({ data: card });
+    res.status(200).send({ card });
   }).catch((err) => {
     if (err.name === 'ValidationError' || err.name === 'CastError') {
       res.status(ErrorBad).send({ message: 'Переданы некорректные данные при создании пользователя.', ...err });
