@@ -79,12 +79,13 @@ const dislikeCard = (req, res, next) => {
     { new: true },
   ).then((card) => {
     if (!card) {
-      throw new ErrorNot('Карточка не найдена');
+      res.status(ErrorNot).send({ message: 'Карточка с указанным _id не найдена.' });
+      // throw new ErrorNot('Карточка не найдена');
     }
-    res.status(200).send({ data: card });
+    res.status(200).send({ card });
   }).catch((err) => {
-    if (err.name === 'CastError') {
-      next(new ErrorBad(`Ошибка валидации: ${err.message}`));
+    if (err.name === 'ValidationError' || err.name === 'CastError') {
+      res.status(ErrorBad).send({ message: 'Переданы некорректные данные при создании пользователя.', ...err });
     } else {
       next(err);
     }
