@@ -19,25 +19,9 @@ const getUserId = async (req, res) => {
     }
     res.status(200).send(user);
   } catch (err) {
-    res.status(ErrorServer).send({ message: 'Произошла ошибка c id', ...err });
+    res.status(ErrorBad.send({ message: 'Произошла ошибка c id', ...err }));
   }
 };
-
-// User.findById(req.params.userId)
-// .then((user) => {
-//   if (!user) {
-//     throw new ErrorNot('Пользователь не найден');
-//   }
-//   res.send(user);
-// })
-// .catch((err) => {
-//   if (err.name === 'CastError') {
-//     next(new ErrorBad(`Ошибка валидации: ${err.message}`));
-//   } else {
-//     next(err);
-//   }
-// });
-// };
 
 const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
