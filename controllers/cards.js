@@ -63,8 +63,8 @@ const likeCard = (req, res, next) => {
     }
     res.status(200).send({ data: card });
   }).catch((err) => {
-    if (err.name === 'CastError' || err.name === 'ValidationError') {
-      next(new ErrorBad(`Ошибка валидации: ${err.message}`));
+    if (err.name === 'ValidationError' || err.name === 'CastError') {
+      res.status(ErrorBad).send({ message: 'Переданы некорректные данные при создании пользователя.', ...err });
     } else {
       next(err);
     }
