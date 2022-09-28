@@ -11,7 +11,30 @@ const getCards = (req, res, next) => {
     .then((cards) => res.status(200).send({ data: cards }))
     .catch(next);
 };
-// await
+
+const createCard = (req, res) => {
+  const { name, link } = req.body;
+  const owner = req.user._id;
+  Card.create({ name, link, owner })
+    .then((user) => res.send({ data: user }))
+    .catch((err) => res.status(ErrorBad).send({ message: 'Переданы некорректные данные при создании пользователя.', ...err }));
+};
+
+// const createCard = async (req, res) => {
+//   const { name, link } = req.body;
+//   const owner = req.user._id;
+//   try {
+//     const card = Card.create({ name, link, owner });
+//     return res.send(card.id);
+//   } catch (err) {
+//     if (err.name === 'ValidationError') {
+//       return res.status(ErrorBad)
+// .send({ message: 'Переданы некорректные данные при создании карточки.' });
+//     }
+//     return res.status(ErrorServer).send({ message: 'Произошла ошибка на сервере' });
+//   }
+// };
+
 const DeleteCardId = async (req, res) => {
   try {
     const card = Card.findByIdAndRemove(req.params.id);
@@ -24,20 +47,6 @@ const DeleteCardId = async (req, res) => {
       return res.status(ErrorBad).send({ message: 'Переданы некорректные данные при удалении карточки.' });
     }
     return res.status(ErrorServer).send({ message: 'ошибка сервера' });
-  }
-};
-
-const createCard = async (req, res) => {
-  const { name, link } = req.body;
-  const owner = req.user._id;
-  try {
-    const card = Card.create({ name, link, owner });
-    return res.send(card.id);
-  } catch (err) {
-    if (err.name === 'ValidationError') {
-      return res.status(ErrorBad).send({ message: 'Переданы некорректные данные при создании карточки.' });
-    }
-    return res.status(ErrorServer).send({ message: 'Произошла ошибка на сервере' });
   }
 };
 
