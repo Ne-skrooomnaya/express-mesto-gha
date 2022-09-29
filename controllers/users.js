@@ -1,13 +1,12 @@
-/* eslint-disable no-underscore-dangle */
-/* eslint-disable import/no-unresolved */
 /* eslint-disable consistent-return */
+/* eslint-disable import/no-unresolved */
 const User = require('../models/User');
 const { ErrorNot, ErrorServer, ErrorBad } = require('../utils/errors');
 
 const getUsers = (req, res) => {
   User.find({})
     .then((users) => res.status(200).send(users))
-    .catch((err) => res.status(ErrorServer).send({ message: 'Ошибка на сервере', ...err }));
+    .catch(() => res.status(ErrorServer).send({ message: 'Ошибка на сервере' }));
 };
 
 const createUser = async (req, res) => {
@@ -18,8 +17,8 @@ const createUser = async (req, res) => {
     if (err.name === 'ValidationError') {
       return res.status(ErrorBad).send({ message: 'Ошибка валидации' });
     }
+    return res.status(ErrorServer).send({ message: 'Ошибка на сервере' });
   }
-  res.status(ErrorServer).send({ message: 'Ошибка на сервере' });
 };
 
 const getUserId = async (req, res) => {
@@ -40,8 +39,6 @@ const getUserId = async (req, res) => {
 
 const updateUserInfo = (req, res) => {
   const { name, about } = req.body;
-  // const { id } = req.params;
-  // const owner = { id };
   User.findByIdAndUpdate(req.user._id, { name, about }, {
     new: true,
     runValidators: true,
@@ -54,7 +51,7 @@ const updateUserInfo = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        return res.status(ErrorBad).send({ message: 'Переданы некорректные данные при создании пользователя.', ...err });
+        return res.status(ErrorBad).send({ message: 'Переданы некорректные данные при создании пользователя.' });
       }
       res.status(ErrorServer).send({ message: 'Ошибка на сервере' });
     });
@@ -74,7 +71,7 @@ const updateUserAvatar = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        return res.status(ErrorBad).send({ message: 'Переданы некорректные данные при создании пользователя.', ...err });
+        return res.status(ErrorBad).send({ message: 'Переданы некорректные данные при создании пользователя.' });
       }
       res.status(ErrorServer).send({ message: 'Ошибка на сервере' });
     });
