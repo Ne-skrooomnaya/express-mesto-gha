@@ -69,7 +69,7 @@ const dislikeCard = (req, res) => {
     res.status(200).send({ data: card });
   }).catch((err) => {
     if (err.name === 'CastError') {
-      res.status(ErrorBad).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+      return res.status(ErrorBad).send({ message: 'Переданы некорректные данные при создании пользователя.' });
     }
     return res.status(ErrorServer).send({ message: 'ошибка сервера' });
   });
