@@ -1,5 +1,6 @@
 /* eslint-disable consistent-return */
 /* eslint-disable import/no-unresolved */
+// const bcrypt = require('bcryptjs'); // импортируем bcrypt
 const User = require('../models/User');
 const { ErrorNot, ErrorServer, ErrorBad } = require('../utils/errors');
 
@@ -20,6 +21,25 @@ const createUser = async (req, res) => {
     return res.status(ErrorServer).send({ message: 'Ошибка на сервере' });
   }
 };
+
+// const createUser = async (req, res) => {
+//   bcrypt.hash(req.body.password, 10).then((hash) => User.create({
+//     email: req.body.email,
+//     password: hash, // записываем хеш в базу
+//   }));
+//   try {
+//     const user = await new User(req.body).save();
+//     return res.send(user);
+//   } catch (err) {
+//     if (err.name === 'ValidationError') {
+//       return res.status(ErrorBad).send({ message: 'Ошибка валидации' });
+//     } if (err.code === 11000) {
+//       return res.status(ErrorBad)
+// .send({ message: 'Пользователь с таким email уже зарегистрирован' });
+//     }
+//     return res.status(ErrorServer).send({ message: 'Ошибка на сервере' });
+//   }
+// };
 
 const getUserId = async (req, res) => {
   const { id } = req.params;

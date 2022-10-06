@@ -5,6 +5,10 @@ const express = require('express');
 const { ErrorNot } = require('./utils/errors');
 const UserRoutes = require('./routes/users');
 const CardRoutes = require('./routes/cards');
+const AdminRoutes = require('./routes/admins');
+// const bcrypt = require('bcryptjs');
+// const bodyParser = require('body-parser');
+// const path = require('path');
 
 const { PORT = 3000 } = process.env;
 
@@ -22,6 +26,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(UserRoutes);
 app.use(CardRoutes);
+app.use(AdminRoutes);
 
 app.use((req, res, next) => {
   res.status(ErrorNot).send({ message: 'Произошла ошибка 4' });
@@ -30,6 +35,8 @@ app.use((req, res, next) => {
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
+  // useCreateIndex: true,
+  // useFindAndModify: false,
   useUnifiedTopology: true,
 })
   .then(() => console.log('connected'))
