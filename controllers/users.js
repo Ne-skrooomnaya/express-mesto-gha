@@ -47,19 +47,35 @@ const login = (req, res, next) => {
     .catch(next);
 };
 
-const getUserId = async (req, res, next) => {
-  User.findById(req.params.userId).then((user) => {
+// const getUserId = async (req, res, next) => {
+//   User.findById(req.params.userId).then((user) => {
+//     if (!user) {
+//       return res.status(ErrorNot).send({ message: 'Такого пользователя не существует 1' });
+//     }
+//     res.status(200).send(user);
+//   }).catch((err) => {
+//     if (err.name === 'CastError') {
+//       return res.status(ErrorBad).send({ message: 'Ошибка валидации' });
+//     }
+//     return res.status(ErrorServer).send({ message: 'Ошибка на сервере' });
+//   })
+//     .catch(next);
+// };
+
+const getUserId = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const user = await User.findById(id);
     if (!user) {
       return res.status(ErrorNot).send({ message: 'Такого пользователя не существует 1' });
     }
     res.status(200).send(user);
-  }).catch((err) => {
+  } catch (err) {
     if (err.name === 'CastError') {
       return res.status(ErrorBad).send({ message: 'Ошибка валидации' });
     }
-    return res.status(ErrorServer).send({ message: 'Ошибка на сервере' });
-  })
-    .catch(next);
+    res.status(ErrorServer).send({ message: 'Ошибка на сервере' });
+  }
 };
 
 const updateUserInfo = (req, res, next) => {
