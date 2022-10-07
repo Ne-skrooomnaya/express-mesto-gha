@@ -3,9 +3,10 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const {
-  ErrorConflict, ErrorNot, ErrorServer, ErrorBad,
-} = require('../utils/errors');
+const { ErrorBad } = require('../utils/ErrorBad');
+const { ErrorConflict } = require('../utils/ErrorConflict');
+const { ErrorNot } = require('../utils/ErrorNot');
+const { ErrorServer } = require('../utils/ErrorServer');
 
 const getUsers = (req, res, next) => {
   User.find({})
@@ -78,8 +79,7 @@ const updateUserInfo = (req, res, next) => {
         return res.status(ErrorBad).send({ message: 'Переданы некорректные данные при создании пользователя.' });
       }
       res.status(ErrorServer).send({ message: 'Ошибка на сервере' });
-    })
-    .catch(next);
+    }).catch(next);
 };
 
 const updateUserAvatar = (req, res, next) => {

@@ -1,9 +1,10 @@
 /* eslint-disable consistent-return */
 /* eslint-disable import/no-unresolved */
 const Card = require('../models/Card');
-const {
-  ErrorForbidden, ErrorNot, ErrorServer, ErrorBad,
-} = require('../utils/errors');
+const { ErrorBad } = require('../utils/ErrorBad');
+const { ErrorForbidden } = require('../utils/ErrorForbidden');
+const { ErrorNot } = require('../utils/ErrorNot');
+const { ErrorServer } = require('../utils/ErrorServer');
 
 const getCards = (req, res, next) => {
   Card.find({})

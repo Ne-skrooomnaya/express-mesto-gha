@@ -1,8 +1,6 @@
 /* eslint-disable consistent-return */
 const jwt = require('jsonwebtoken');
-const {
-  ErrorUnauthorized,
-} = require('../utils/errors');
+const { ErrorUnauthorized } = require('../utils/ErrorUnauthorized');
 
 module.exports = async (req, res, next) => {
   const { authorization } = req.headers;

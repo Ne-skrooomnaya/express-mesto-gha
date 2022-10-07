@@ -1,9 +1,11 @@
 const express = require('express');
 
 const CardRoutes = express.Router();
+
 const {
   createCard, getCards, DeleteCardId, dislikeCard, likeCard,
 } = require('../controllers/cards');
+
 const {
   cardValidation, cardIdValidation,
 } = require('../middlewares/validation');

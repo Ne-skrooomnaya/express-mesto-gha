@@ -8,7 +8,7 @@ const bodyParser = require('body-parser');
 const { authValidation, registerValidation } = require('./middlewares/validation');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
-const { ErrorNot } = require('./utils/errors');
+const { ErrorNot } = require('./utils/ErrorNot');
 const UserRoutes = require('./routes/users');
 const CardRoutes = require('./routes/cards');
 

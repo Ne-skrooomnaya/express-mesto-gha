@@ -1,9 +1,11 @@
 const express = require('express');
+
+const UserRoutes = express.Router();
+
 const {
   userValidation, userIdValidation, avatarValidation,
 } = require('../middlewares/validation');
 
-const UserRoutes = express.Router();
 const {
   getUserInfo, getUsers, getUserId, updateUserInfo, updateUserAvatar,
 } = require('../controllers/users');
