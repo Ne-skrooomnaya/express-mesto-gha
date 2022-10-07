@@ -7,10 +7,11 @@ const {
   ErrorConflict, ErrorNot, ErrorServer, ErrorBad,
 } = require('../utils/errors');
 
-const getUsers = (req, res) => {
+const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.status(200).send(users))
-    .catch(() => res.status(ErrorServer).send({ message: 'Ошибка на сервере' }));
+    .catch(() => res.status(ErrorServer).send({ message: 'Ошибка на сервере' }))
+    .catch(next);
 };
 
 const createUser = (req, res) => {
@@ -45,7 +46,7 @@ const login = (req, res, next) => {
     .catch(next);
 };
 
-const getUserId = async (req, res) => {
+const getUserId = async (req, res, next) => {
   User.findById(req.params.userId).then((user) => {
     if (!user) {
       return res.status(ErrorNot).send({ message: 'Такого пользователя не существует 1' });
@@ -56,10 +57,11 @@ const getUserId = async (req, res) => {
       return res.status(ErrorBad).send({ message: 'Ошибка валидации' });
     }
     return res.status(ErrorServer).send({ message: 'Ошибка на сервере' });
-  });
+  })
+    .catch(next);
 };
 
-const updateUserInfo = (req, res) => {
+const updateUserInfo = (req, res, next) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(req.user._id, { name, about }, {
     new: true,
@@ -76,10 +78,11 @@ const updateUserInfo = (req, res) => {
         return res.status(ErrorBad).send({ message: 'Переданы некорректные данные при создании пользователя.' });
       }
       res.status(ErrorServer).send({ message: 'Ошибка на сервере' });
-    });
+    })
+    .catch(next);
 };
 
-const updateUserAvatar = (req, res) => {
+const updateUserAvatar = (req, res, next) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(req.user._id, { avatar }, {
     new: true,
@@ -96,7 +99,8 @@ const updateUserAvatar = (req, res) => {
         return res.status(ErrorBad).send({ message: 'Переданы некорректные данные при создании пользователя.' });
       }
       res.status(ErrorServer).send({ message: 'Ошибка на сервере' });
-    });
+    })
+    .catch(next);
 };
 
 const getUserInfo = (req, res, next) => {

@@ -5,10 +5,11 @@ const {
   ErrorForbidden, ErrorNot, ErrorServer, ErrorBad,
 } = require('../utils/errors');
 
-const getCards = (req, res) => {
+const getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => res.status(200).send({ data: cards }))
-    .catch(() => res.status(ErrorServer).send({ message: 'Ошибка на сервере' }));
+    .catch(() => res.status(ErrorServer).send({ message: 'Ошибка на сервере' }))
+    .catch(next);
 };
 
 const createCard = async (req, res) => {
@@ -39,28 +40,8 @@ const DeleteCardId = async (req, res, next) => {
     })
     .catch(next);
 };
-//   const { id } = req.params;
-//   try {
-//     const card = await Card.findByIdAndRemove(id);
-//     if (!card) {
-// return res.status(ErrorNot).send({ message: 'Карточка с указанным _id не найдена.' });
-//     }
-//     if (card.owner.toString() === req.user._id) {
-//       res.status(200).send(card);
-//     } else {
-//       return res.status(ErrorForbidden).send({ message: 'Удаление чужой карточки невозможно' });
-//     }
-//     return res.status(200).send({ message: 'карточка удалена' });
-//   } catch (err) {
-//     if (err.name === 'CastError') {
-//       return res.status(ErrorBad)
-// .send({ message: 'Переданы некорректные данные при удалении карточки.' });
-//     }
-//     return res.status(ErrorServer).send({ message: 'ошибка сервера' });
-//   }
-// };
 
-const likeCard = (req, res) => {
+const likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
@@ -75,10 +56,11 @@ const likeCard = (req, res) => {
       return res.status(ErrorBad).send({ message: 'Переданы некорректные данные при создании пользователя.' });
     }
     return res.status(ErrorServer).send({ message: 'ошибка сервера' });
-  });
+  })
+    .catch(next);
 };
 
-const dislikeCard = (req, res) => {
+const dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
@@ -93,7 +75,7 @@ const dislikeCard = (req, res) => {
       return res.status(ErrorBad).send({ message: 'Переданы некорректные данные при создании пользователя.' });
     }
     return res.status(ErrorServer).send({ message: 'ошибка сервера' });
-  });
+  }).catch(next);
 };
 
 module.exports = {
