@@ -8,14 +8,13 @@ const { ErrorConflict } = require('../utils/ErrorConflict');
 const { ErrorNot } = require('../utils/ErrorNot');
 const { ErrorServer } = require('../utils/ErrorServer');
 
-const getUsers = (req, res, next) => {
+const getUsers = (req, res) => {
   User.find({})
     .then((users) => res.status(200).send(users))
-    .catch(() => res.status(ErrorServer).send({ message: 'Ошибка на сервере' }))
-    .catch(next);
+    .catch(() => res.status(ErrorServer).send({ message: 'Ошибка на сервере' }));
 };
 
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const {
     name, about, avatar, email,
   } = req.body;
@@ -30,9 +29,11 @@ const createUser = (req, res) => {
       });
     }).catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(ErrorBad).send({ message: 'Ошибка валидации' });
+        next(new ErrorBad(`Ошибка валидации: ${err.message}`));
       } if (err.code === 11000) {
-        return res.status(ErrorConflict).send({ message: 'Пользователь с таким email уже зарегистрирован' });
+        next(new ErrorConflict('Пользователь с таким email уже зарегистрирован'));
+      } else {
+        next(err);
       }
     });
 };
@@ -62,7 +63,7 @@ const login = (req, res, next) => {
 //     .catch(next);
 // };
 
-const getUserId = async (req, res) => {
+const getUserId = async (req, res, next) => {
   const { id } = req.params;
   try {
     const user = await User.findById(id);
@@ -76,6 +77,7 @@ const getUserId = async (req, res) => {
     }
     res.status(ErrorServer).send({ message: 'Ошибка на сервере' });
   }
+  next();
 };
 
 const updateUserInfo = (req, res, next) => {
