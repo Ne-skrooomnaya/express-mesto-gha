@@ -55,7 +55,7 @@ const getUserId = async (req, res) => {
     if (err.name === 'CastError') {
       return res.status(ErrorBad).send({ message: 'Ошибка валидации' });
     }
-    res.status(ErrorServer).send({ message: 'Ошибка на сервере' });
+    return res.status(ErrorServer).send({ message: 'Ошибка на сервере' });
   });
 };
 

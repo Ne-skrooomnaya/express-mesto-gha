@@ -25,37 +25,51 @@ const createCard = async (req, res) => {
   }
 };
 
-const DeleteCardId = async (req, res) => {
-  const { id } = req.params;
-  try {
-    const card = await Card.findByIdAndRemove(id);
-    if (!card) {
-      return res.status(ErrorNot).send({ message: 'Карточка с указанным _id не найдена.' });
-    }
-    if (card.owner.toString() === req.user._id) {
-      res.status(200).send(card);
-    } else {
-      return res.status(ErrorForbidden).send({ message: 'Удаление чужой карточки невозможно' });
-    }
-    return res.status(200).send({ message: 'карточка удалена' });
-  } catch (err) {
-    if (err.name === 'CastError') {
-      return res.status(ErrorBad).send({ message: 'Переданы некорректные данные при удалении карточки.' });
-    }
-    return res.status(ErrorServer).send({ message: 'ошибка сервера' });
-  }
+const DeleteCardId = async (req, res, next) => {
+  Card.findByIdAndRemove(req.params.cardId)
+    .then((card) => {
+      if (!card) {
+        return res.status(ErrorNot).send({ message: 'Карточка с указанным _id не найдена.' });
+      }
+      if (card.owner.toString() === req.user._id) {
+        res.status(200).send(card);
+      } else {
+        return res.status(ErrorForbidden).send({ message: 'Удаление чужой карточки невозможно' });
+      }
+    })
+    .catch(next);
 };
+//   const { id } = req.params;
+//   try {
+//     const card = await Card.findByIdAndRemove(id);
+//     if (!card) {
+// return res.status(ErrorNot).send({ message: 'Карточка с указанным _id не найдена.' });
+//     }
+//     if (card.owner.toString() === req.user._id) {
+//       res.status(200).send(card);
+//     } else {
+//       return res.status(ErrorForbidden).send({ message: 'Удаление чужой карточки невозможно' });
+//     }
+//     return res.status(200).send({ message: 'карточка удалена' });
+//   } catch (err) {
+//     if (err.name === 'CastError') {
+//       return res.status(ErrorBad)
+// .send({ message: 'Переданы некорректные данные при удалении карточки.' });
+//     }
+//     return res.status(ErrorServer).send({ message: 'ошибка сервера' });
+//   }
+// };
 
 const likeCard = (req, res) => {
   Card.findByIdAndUpdate(
-    req.params.id,
+    req.params.cardId,
     { $addToSet: { likes: req.user._id } },
     { new: true },
   ).then((card) => {
     if (!card) {
       return res.status(ErrorNot).send({ message: 'Карточка с указанным _id не найдена.' });
     }
-    res.status(200).send({ card });
+    res.status(200).send({ data: card });
   }).catch((err) => {
     if (err.name === 'ValidationError' || err.name === 'CastError') {
       return res.status(ErrorBad).send({ message: 'Переданы некорректные данные при создании пользователя.' });
@@ -66,7 +80,7 @@ const likeCard = (req, res) => {
 
 const dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(
-    req.params.id,
+    req.params.cardId,
     { $pull: { likes: req.user._id } },
     { new: true },
   ).then((card) => {
