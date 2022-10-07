@@ -1,8 +1,11 @@
 /* eslint-disable consistent-return */
 /* eslint-disable import/no-unresolved */
-// const bcrypt = require('bcryptjs'); // импортируем bcrypt
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const { ErrorNot, ErrorServer, ErrorBad } = require('../utils/errors');
+const {
+  ErrorConflict, ErrorNot, ErrorServer, ErrorBad,
+} = require('../utils/errors');
 
 const getUsers = (req, res) => {
   User.find({})
@@ -10,36 +13,37 @@ const getUsers = (req, res) => {
     .catch(() => res.status(ErrorServer).send({ message: 'Ошибка на сервере' }));
 };
 
-const createUser = async (req, res) => {
-  try {
-    const user = await new User(req.body).save();
-    return res.send(user);
-  } catch (err) {
-    if (err.name === 'ValidationError') {
-      return res.status(ErrorBad).send({ message: 'Ошибка валидации' });
-    }
-    return res.status(ErrorServer).send({ message: 'Ошибка на сервере' });
-  }
+const createUser = (req, res) => {
+  const {
+    name, about, avatar, email,
+  } = req.body;
+  bcrypt.hash(req.body.password, 10)
+    .then((hash) => User.create({
+      name, about, avatar, email, password: hash,
+    })).then(() => {
+      res.status(200).send({
+        data: {
+          name, about, avatar, email,
+        },
+      });
+    }).catch((err) => {
+      if (err.name === 'ValidationError') {
+        return res.status(ErrorBad).send({ message: 'Ошибка валидации' });
+      } if (err.code === 11000) {
+        return res.status(ErrorConflict).send({ message: 'Пользователь с таким email уже зарегистрирован' });
+      }
+    });
 };
 
-// const createUser = async (req, res) => {
-//   bcrypt.hash(req.body.password, 10).then((hash) => User.create({
-//     email: req.body.email,
-//     password: hash, // записываем хеш в базу
-//   }));
-//   try {
-//     const user = await new User(req.body).save();
-//     return res.send(user);
-//   } catch (err) {
-//     if (err.name === 'ValidationError') {
-//       return res.status(ErrorBad).send({ message: 'Ошибка валидации' });
-//     } if (err.code === 11000) {
-//       return res.status(ErrorBad)
-// .send({ message: 'Пользователь с таким email уже зарегистрирован' });
-//     }
-//     return res.status(ErrorServer).send({ message: 'Ошибка на сервере' });
-//   }
-// };
+const login = (req, res, next) => {
+  const { email, password } = req.body;
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+      res.send({ token });
+    })
+    .catch(next);
+};
 
 const getUserId = async (req, res) => {
   const { id } = req.params;
@@ -97,10 +101,23 @@ const updateUserAvatar = (req, res) => {
     });
 };
 
+const getUserInfo = (req, res, next) => {
+  User.findById(req.user._id)
+    .then((user) => {
+      if (!user) {
+        return res.status(ErrorNot).send({ message: 'пользователь не найден' });
+      }
+      res.status(200).send({ user });
+    })
+    .catch(next);
+};
+
 module.exports = {
   createUser,
+  login,
   getUsers,
   getUserId,
   updateUserInfo,
   updateUserAvatar,
+  getUserInfo,
 };

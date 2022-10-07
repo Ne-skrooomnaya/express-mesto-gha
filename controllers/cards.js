@@ -1,7 +1,9 @@
 /* eslint-disable consistent-return */
 /* eslint-disable import/no-unresolved */
 const Card = require('../models/Card');
-const { ErrorNot, ErrorServer, ErrorBad } = require('../utils/errors');
+const {
+  ErrorForbidden, ErrorNot, ErrorServer, ErrorBad,
+} = require('../utils/errors');
 
 const getCards = (req, res) => {
   Card.find({})
@@ -14,7 +16,7 @@ const createCard = async (req, res) => {
   const owner = req.user._id;
   try {
     const card = await Card.create({ name, link, owner });
-    return res.send({ data: card });
+    return res.status(200).send({ data: card });
   } catch (err) {
     if (err.name === 'ValidationError') {
       return res.status(ErrorBad).send({ message: 'Ошибка валидации' });
@@ -29,6 +31,11 @@ const DeleteCardId = async (req, res) => {
     const card = await Card.findByIdAndRemove(id);
     if (!card) {
       return res.status(ErrorNot).send({ message: 'Карточка с указанным _id не найдена.' });
+    }
+    if (card.owner.toString() === req.user._id) {
+      res.status(200).send(card);
+    } else {
+      return res.status(ErrorForbidden).send({ message: 'Удаление чужой карточки невозможно' });
     }
     return res.status(200).send({ message: 'карточка удалена' });
   } catch (err) {

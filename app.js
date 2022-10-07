@@ -1,37 +1,23 @@
-/* eslint-disable no-console */
+/* eslint-disable import/extensions */
+/* eslint-disable import/no-unresolved */
 const mongoose = require('mongoose');
 const express = require('express');
-// const path = require('path');
+const cors = require('cors');
+const { errors } = require('celebrate');
+const bodyParser = require('body-parser');
+const { authValidation, registerValidation } = require('./middlewares/validation');
+const { login, createUser } = require('./controllers/users');
+const auth = require('./middlewares/auth');
 const { ErrorNot } = require('./utils/errors');
 const UserRoutes = require('./routes/users');
 const CardRoutes = require('./routes/cards');
-const AdminRoutes = require('./routes/admins');
-// const bcrypt = require('bcryptjs');
-// const bodyParser = require('body-parser');
-// const path = require('path');
 
 const { PORT = 3000 } = process.env;
-
 const app = express();
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '632e3013375cfba161288833',
-  };
-  next();
-});
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-app.use(UserRoutes);
-app.use(CardRoutes);
-app.use(AdminRoutes);
-
-app.use((req, res, next) => {
-  res.status(ErrorNot).send({ message: 'Произошла ошибка 4' });
-  next();
-});
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cors());
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
@@ -41,6 +27,28 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 })
   .then(() => console.log('connected'))
   .catch((err) => console.log(`Ошибка ${err.name}: ${err.message}`));
+
+app.use((req, res, next) => {
+  console.log(`${req.method}: ${req.path} ${JSON.stringify(req.body)}`);
+  next();
+});
+
+app.post('/signin', authValidation, login);
+app.post('/signup', registerValidation, createUser);
+
+app.use('/', auth, UserRoutes);
+app.use('/', auth, CardRoutes);
+app.use('/', (req, res, next) => {
+  res.status(ErrorNot).send({ message: 'Страница не найдена 3' });
+  next();
+});
+
+app.use(errors());
+
+app.use((req, res, next) => {
+  res.status(ErrorNot).send({ message: 'Произошла ошибка 4' });
+  next();
+});
 
 app.listen(PORT, () => {
   console.log(`Сервер запущен на ${PORT} порту`);
