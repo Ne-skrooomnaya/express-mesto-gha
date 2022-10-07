@@ -1,11 +1,11 @@
 const { celebrate, Joi } = require('celebrate');
 const validator = require('validator');
-const { ErrorUnauthorized } = require('../utils/ErrorUnauthorized');
+// const { ErrorUnauthorized } = require('../utils/ErrorUnauthorized');
 
-const validateUrl = ((value, res) => {
+const validateUrl = ((value) => {
   const result = validator.isURL(value);
   if (!result) {
-    return res.status(ErrorUnauthorized).send({ message: 'URL validation err' });
+    throw new Error('URL validation err');
   }
   return value;
 });

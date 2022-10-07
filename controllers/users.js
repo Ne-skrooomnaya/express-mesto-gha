@@ -31,7 +31,9 @@ const createUser = (req, res, next) => {
       if (err.name === 'ValidationError') {
         next(new ErrorBad(`Ошибка валидации: ${err.message}`));
       } if (err.code === 11000) {
-        next(new ErrorConflict('Пользователь с таким email уже зарегистрирован'));
+        next(new ErrorConflict('Пользователь с таким email уже зарегистрирован 5'));
+      // res.status(ErrorConflict)
+      // .send({ message: 'Пользователь с таким email уже зарегистрирован 5' });
       } else {
         next(err);
       }
