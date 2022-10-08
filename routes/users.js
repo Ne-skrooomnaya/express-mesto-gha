@@ -19,7 +19,7 @@ UserRoutes.get('/users/id', express.json(), userIdValidation, getUserId);
 UserRoutes.patch('/users/me', express.json(), userValidation, updateUserInfo);
 UserRoutes.patch('/users/me/avatar', express.json(), avatarValidation, updateUserAvatar);
 UserRoutes.post('/signup', express.json(), registerValidation, createUser);
-UserRoutes.post('/signup', express.json(), authValidation, login);
+UserRoutes.post('/signin', express.json(), authValidation, login);
 UserRoutes.use(auth);
 
 module.exports = UserRoutes;
