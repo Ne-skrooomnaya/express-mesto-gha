@@ -24,18 +24,21 @@ const createUser = async (req, res, next) => {
     about,
     avatar,
     email,
-    password,
   } = req.body;
   try {
-    const hash = await bcrypt.hash(password, 10);
-    const user = await User.create({
+    const hash = await bcrypt.hash(req.body.password, 10);
+    User.create({
       name,
       about,
       avatar,
       email,
       password: hash,
     });
-    return res.status(200).send(user);
+    return res.status(200).send({
+      data: {
+        name, about, avatar, email,
+      },
+    });
   } catch (err) {
     if (err.name === 'ValidationError') {
       return next(new ErrorBad('Ошибка валидации'));
@@ -45,14 +48,6 @@ const createUser = async (req, res, next) => {
     }
     return next(new ErrorServer('Ошибка на сервере'));
   }
-};
-
-const login = (req, res, next) => {
-  const { email, password } = req.body;
-  User.findUserByCredentials(email, password).then((user) => {
-    const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
-    res.send({ token });
-  }).catch(next);
 };
 
 const getUserId = async (req, res, next) => {
@@ -113,8 +108,9 @@ const updateUserAvatar = async (req, res, next) => {
 };
 
 const getUserInfo = async (req, res, next) => {
+  const owner = req.user._id;
   try {
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(owner);
     if (!user) {
       return next(new ErrorNot('Такого пользователя не существует 1'));
     }
@@ -122,6 +118,15 @@ const getUserInfo = async (req, res, next) => {
   } catch (err) {
     return next(new ErrorNot('Такого пользователя не существует 1'));
   }
+};
+
+const login = (req, res, next) => {
+  const { email, password } = req.body;
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ id: user.id }, 'some-secret-key', { expiresIn: '7d' });
+      res.send({ token });
+    }).catch(next);
 };
 
 module.exports = {
