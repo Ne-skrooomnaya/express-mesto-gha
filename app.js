@@ -29,7 +29,7 @@ app.use(errors());
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
-  const message = statusCode === 500 ? 'Ошибка на сервере' : err.message;
+  const message = statusCode === 500 ? 'Ошибка на сервере 3' : err.message;
   res.status(statusCode).send({ message });
   next();
 });
