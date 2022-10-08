@@ -2,19 +2,13 @@ const express = require('express');
 
 const UserRoutes = express.Router();
 
-const auth = require('../middlewares/auth');
-
 const {
-  userValidation, userIdValidation, avatarValidation, registerValidation, authValidation,
+  userValidation, userIdValidation, avatarValidation,
 } = require('../middlewares/validation');
 
 const {
-  getUserInfo, getUsers, getUserId, updateUserInfo, updateUserAvatar, createUser, login,
+  getUserInfo, getUsers, getUserId, updateUserInfo, updateUserAvatar,
 } = require('../controllers/users');
-
-UserRoutes.post('/signup', express.json(), registerValidation, createUser);
-UserRoutes.post('/signin', express.json(), authValidation, login);
-UserRoutes.use(auth);
 
 UserRoutes.get('/users', express.json(), getUsers);
 UserRoutes.get('/users/me', express.json(), getUserInfo);
