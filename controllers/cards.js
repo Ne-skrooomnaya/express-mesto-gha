@@ -1,87 +1,97 @@
 /* eslint-disable consistent-return */
 /* eslint-disable import/no-unresolved */
 const Card = require('../models/Card');
+
 const { ErrorBad } = require('../utils/ErrorBad');
 const { ErrorForbidden } = require('../utils/ErrorForbidden');
 const { ErrorNot } = require('../utils/ErrorNot');
 const { ErrorServer } = require('../utils/ErrorServer');
 
-const getCards = (req, res, next) => {
-  Card.find({})
-    .then((cards) => res.status(200).send({ data: cards }))
-    .catch(() => res.status(ErrorServer).send({ message: 'Ошибка на сервере' }))
-    .catch(next);
+const getCards = async (req, res, next) => {
+  try {
+    const cards = await Card.find({});
+    return res.status(200).send(cards);
+  } catch (err) {
+    return next(new ErrorServer('Ошибка на сервере'));
+  }
 };
 
-const createCard = async (req, res) => {
+const createCard = async (req, res, next) => {
   const { name, link } = req.body;
   const owner = req.user._id;
   try {
     const card = await Card.create({ name, link, owner });
-    return res.status(200).send({ data: card });
+    return res.status(200).send({ card });
   } catch (err) {
     if (err.name === 'ValidationError') {
-      return res.status(ErrorBad).send({ message: 'Ошибка валидации' });
+      return next(new ErrorBad('Ошибка валидации'));
     }
-    return res.status(ErrorServer).send({ message: 'Ошибка на сервере' });
+    return next(new ErrorServer('Ошибка на сервере'));
   }
 };
 
-const DeleteCardId = async (req, res, next) => {
-  Card.findByIdAndRemove(req.params.cardId)
-    .then((card) => {
-      if (!card) {
-        return res.status(ErrorNot).send({ message: 'Карточка с указанным _id не найдена.' });
-      }
-      if (card.owner.toString() === req.user._id) {
-        res.status(200).send(card);
-      } else {
-        return res.status(ErrorForbidden).send({ message: 'Удаление чужой карточки невозможно' });
-      }
-    })
-    .catch(next);
-};
-
-const likeCard = (req, res, next) => {
-  Card.findByIdAndUpdate(
-    req.params.cardId,
-    { $addToSet: { likes: req.user._id } },
-    { new: true },
-  ).then((card) => {
+const deleteCardId = async (req, res, next) => {
+  const { id } = req.params;
+  const owner = req.user._id;
+  try {
+    const card = await Card.findByIdAndRemove(id);
     if (!card) {
-      return res.status(ErrorNot).send({ message: 'Карточка с указанным _id не найдена.' });
+      return next(new ErrorNot('Карточка с указанным _id не найдена.'));
     }
-    res.status(200).send({ data: card });
-  }).catch((err) => {
-    if (err.name === 'ValidationError' || err.name === 'CastError') {
-      return res.status(ErrorBad).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+    if (owner !== card.owner.toString()) {
+      return next(new ErrorForbidden('Вы не можете удалить чужую карточку'));
     }
-    return res.status(ErrorServer).send({ message: 'ошибка сервера' });
-  })
-    .catch(next);
-};
-
-const dislikeCard = (req, res, next) => {
-  Card.findByIdAndUpdate(
-    req.params.cardId,
-    { $pull: { likes: req.user._id } },
-    { new: true },
-  ).then((card) => {
-    if (!card) {
-      return res.status(ErrorNot).send({ message: 'Карточка с указанным _id не найдена.' });
-    }
-    res.status(200).send({ data: card });
-  }).catch((err) => {
+    await Card.findByIdAndRemove(card);
+    return res.status(200).send({ message: 'карточка удалена' });
+  } catch (err) {
     if (err.name === 'CastError') {
-      return res.status(ErrorBad).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+      return next(new ErrorBad('Ошибка валидации'));
     }
-    return res.status(ErrorServer).send({ message: 'ошибка сервера' });
-  }).catch(next);
+    return next(new ErrorServer('Ошибка на сервере'));
+  }
+};
+
+const likeCard = async (req, res, next) => {
+  try {
+    const card = await Card.findByIdAndUpdate(
+      req.params.id,
+      { $addToSet: { likes: req.user._id } },
+      { new: true },
+    );
+    if (!card) {
+      return next(new ErrorNot('Карточка с указанным _id не найдена.'));
+    }
+    res.status(200).send(card);
+  } catch (err) {
+    if (err.kind === 'ObjectId') {
+      return next(new ErrorBad('Ошибка валидации'));
+    }
+    return next(new ErrorServer('Ошибка на сервере'));
+  }
+};
+
+const dislikeCard = async (req, res, next) => {
+  try {
+    const card = await Card.findByIdAndUpdate(
+      req.params.id,
+      { $pull: { likes: req.user._id } },
+      { new: true },
+    );
+    if (!card) {
+      return next(new ErrorNot('Карточка с указанным _id не найдена.'));
+    }
+    res.status(200).send(card);
+  } catch (err) {
+    if (err.name === 'CastError') {
+      return next(new ErrorBad('Ошибка валидации'));
+    }
+    return next(new ErrorServer('Ошибка на сервере'));
+  }
 };
 
 module.exports = {
   getCards,
-  DeleteCardId,
+  deleteCardId,
   createCard,
   likeCard,
   dislikeCard,
