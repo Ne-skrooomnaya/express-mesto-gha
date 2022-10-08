@@ -108,15 +108,15 @@ const updateUserAvatar = async (req, res, next) => {
 };
 
 const getUserInfo = async (req, res, next) => {
-  const owner = req.user._id;
   try {
+    const owner = req.user._id;
     const user = await User.findById(owner);
     if (!user) {
       return next(new ErrorNot('Такого пользователя не существует 1'));
     }
-    res.status(200).send(user);
+    return res.status(200).send(user);
   } catch (err) {
-    return next(new ErrorNot('Такого пользователя не существует 1'));
+    return next(new ErrorServer('Ошибка на сервере'));
   }
 };
 
