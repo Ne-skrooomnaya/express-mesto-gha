@@ -51,9 +51,9 @@ const createUser = async (req, res, next) => {
 };
 
 const getUserId = async (req, res, next) => {
-  const { id } = req.params;
+  const { _id } = req.params;
   try {
-    const user = await User.findById(id);
+    const user = await User.findById(_id);
     if (!user) {
       return next(new ErrorNot('Такого пользователя не существует 1'));
     }
