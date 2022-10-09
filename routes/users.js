@@ -12,7 +12,7 @@ const {
 
 UserRoutes.get('/users', express.json(), getUsers);
 UserRoutes.get('/users/me', express.json(), getUserInfo);
-UserRoutes.get('/users/id', express.json(), userIdValidation, getUserId);
+UserRoutes.get('/users/_id', express.json(), userIdValidation, getUserId);
 UserRoutes.patch('/users/me', express.json(), userValidation, updateUserInfo);
 UserRoutes.patch('/users/me/avatar', express.json(), avatarValidation, updateUserAvatar);
 

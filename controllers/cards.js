@@ -61,7 +61,7 @@ const likeCard = async (req, res, next) => {
     if (!card) {
       return next(new ErrorNot('Карточка с указанным _id не найдена.'));
     }
-    res.status(200).send(card);
+    res.status(200).send({ card });
   } catch (err) {
     if (err.kind === 'ObjectId') {
       return next(new ErrorBad('Ошибка валидации'));
