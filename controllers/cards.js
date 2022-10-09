@@ -31,17 +31,17 @@ const createCard = async (req, res, next) => {
 };
 
 const deleteCardId = async (req, res, next) => {
-  const { _id } = req.params;
+  const { id } = req.params;
   const owner = req.user._id;
   try {
-    const card = await Card.findByIdAndRemove(_id);
+    const card = await Card.findByIdAndRemove(id);
     if (!card) {
       return next(new ErrorNot('Карточка с указанным _id не найдена.'));
     }
     if (owner !== card.owner.toString()) {
       return next(new ErrorForbidden('Вы не можете удалить чужую карточку'));
     }
-    await Card.findByIdAndRemove(card);
+    await Card.findByIdAndRemove(id);
     return res.status(200).send({ message: 'карточка удалена' });
   } catch (err) {
     if (err.name === 'CastError') {
@@ -54,14 +54,14 @@ const deleteCardId = async (req, res, next) => {
 const likeCard = async (req, res, next) => {
   try {
     const card = await Card.findByIdAndUpdate(
-      req.params.id,
+      req.params,
       { $addToSet: { likes: req.user._id } },
       { new: true },
     );
     if (!card) {
       return next(new ErrorNot('Карточка с указанным _id не найдена.'));
     }
-    res.status(200).send({ data: card });
+    res.status(200).send(card);
   } catch (err) {
     if (err.kind === 'ObjectId') {
       return next(new ErrorBad('Ошибка валидации'));
@@ -73,14 +73,14 @@ const likeCard = async (req, res, next) => {
 const dislikeCard = async (req, res, next) => {
   try {
     const card = await Card.findByIdAndUpdate(
-      req.params.id,
+      req.params,
       { $pull: { likes: req.user._id } },
       { new: true },
     );
     if (!card) {
       return next(new ErrorNot('Карточка с указанным _id не найдена.'));
     }
-    res.status(200).send({ data: card });
+    res.status(200).send(card);
   } catch (err) {
     if (err.name === 'CastError') {
       return next(new ErrorBad('Ошибка валидации'));

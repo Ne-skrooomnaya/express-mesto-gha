@@ -51,13 +51,13 @@ const createUser = async (req, res, next) => {
 };
 
 const getUserId = async (req, res, next) => {
-  const { _id } = req.params;
+  const { id } = req.params;
   try {
-    const user = await User.findById(_id);
+    const user = await User.findById(id);
     if (!user) {
       return next(new ErrorNot('Такого пользователя не существует 1'));
     }
-    return res.status(200).send(user);
+    return res.status(200).send({ user });
   } catch (err) {
     if (err.kind === 'ObjectId') {
       return next(new ErrorBad('Ошибка валидации'));
