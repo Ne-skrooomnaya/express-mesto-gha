@@ -54,14 +54,14 @@ const deleteCardId = async (req, res, next) => {
 const likeCard = async (req, res, next) => {
   try {
     const card = await Card.findByIdAndUpdate(
-      req.params._id,
+      req.params.id,
       { $addToSet: { likes: req.user._id } },
       { new: true },
     );
     if (!card) {
       return next(new ErrorNot('Карточка с указанным _id не найдена.'));
     }
-    res.status(200).send({ card });
+    res.status(200).send({ data: card });
   } catch (err) {
     if (err.kind === 'ObjectId') {
       return next(new ErrorBad('Ошибка валидации'));
@@ -73,14 +73,14 @@ const likeCard = async (req, res, next) => {
 const dislikeCard = async (req, res, next) => {
   try {
     const card = await Card.findByIdAndUpdate(
-      req.params._id,
+      req.params.id,
       { $pull: { likes: req.user._id } },
       { new: true },
     );
     if (!card) {
       return next(new ErrorNot('Карточка с указанным _id не найдена.'));
     }
-    res.status(200).send(card);
+    res.status(200).send({ data: card });
   } catch (err) {
     if (err.name === 'CastError') {
       return next(new ErrorBad('Ошибка валидации'));
