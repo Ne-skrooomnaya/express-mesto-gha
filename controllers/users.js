@@ -138,7 +138,7 @@ const login = async (req, res, next) => {
       httpOnly: true,
       sameSite: true,
     });
-    return res.status(200).send(user.toJSON());
+    return res.status(200).send({ token });
   } catch (error) {
     return next(new ErrorServer('Ошибка на сервере'));
   }
