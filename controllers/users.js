@@ -48,16 +48,16 @@ const createUser = async (req, res, next) => {
 };
 
 const getUserId = async (req, res, next) => {
-  const { id } = req.params;
+  const { userId } = req.params;
   try {
-    const user = await User.findById(id);
-    if (!user) {
-      return next(new ErrorNot('Такого пользователя не существует 1'));
+    const user = await User.findById(userId);
+    if (user) {
+      return res.send(user);
     }
-    return res.status(200).send({ user });
+    return next(new ErrorNot('Указанный пользователь не найден'));
   } catch (err) {
     if (err.kind === 'ObjectId') {
-      return next(new ErrorBad('Ошибка валидации'));
+      return next(new ErrorBad('Переданы невалидные данные'));
     }
     return next(new ErrorServer('Ошибка на сервере'));
   }

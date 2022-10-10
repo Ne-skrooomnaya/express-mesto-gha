@@ -31,17 +31,17 @@ const createCard = async (req, res, next) => {
 };
 
 const deleteCardId = async (req, res, next) => {
-  const { id } = req.params;
+  const { cardId } = req.params;
   const owner = req.user._id;
   try {
-    const card = await Card.findByIdAndRemove(id);
+    const card = await Card.findByIdAndRemove(cardId);
     if (!card) {
       return next(new ErrorNot('Карточка с указанным _id не найдена.'));
     }
     if (owner !== card.owner.toString()) {
       return next(new ErrorForbidden('Вы не можете удалить чужую карточку'));
     }
-    await Card.findByIdAndRemove(id);
+    await Card.findByIdAndRemove(cardId);
     return res.status(200).send({ message: 'карточка удалена' });
   } catch (err) {
     if (err.name === 'CastError') {
@@ -52,9 +52,10 @@ const deleteCardId = async (req, res, next) => {
 };
 
 const likeCard = async (req, res, next) => {
+  const { cardId } = req.params;
   try {
     const card = await Card.findByIdAndUpdate(
-      req.params,
+      cardId,
       { $addToSet: { likes: req.user._id } },
       { new: true },
     );
@@ -71,9 +72,10 @@ const likeCard = async (req, res, next) => {
 };
 
 const dislikeCard = async (req, res, next) => {
+  const { cardId } = req.params;
   try {
     const card = await Card.findByIdAndUpdate(
-      req.params,
+      cardId,
       { $pull: { likes: req.user._id } },
       { new: true },
     );
