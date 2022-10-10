@@ -1,6 +1,5 @@
 const { celebrate, Joi } = require('celebrate');
 const validator = require('validator');
-// const { ErrorUnauthorized } = require('../utils/ErrorUnauthorized');
 
 const validateUrl = ((value) => {
   const result = validator.isURL(value);

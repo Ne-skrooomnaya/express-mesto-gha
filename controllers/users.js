@@ -8,6 +8,7 @@ const { ErrorBad } = require('../utils/ErrorBad');
 const { ErrorConflict } = require('../utils/ErrorConflict');
 const { ErrorNot } = require('../utils/ErrorNot');
 const { ErrorServer } = require('../utils/ErrorServer');
+const { ErrorUnauthorized } = require('../utils/ErrorUnauthorized');
 
 const getUsers = async (req, res, next) => {
   try {
@@ -24,24 +25,21 @@ const createUser = async (req, res, next) => {
     about,
     avatar,
     email,
+    password,
   } = req.body;
   try {
-    const hash = await bcrypt.hash(req.body.password, 10);
-    User.create({
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = await User.create({
       name,
       about,
       avatar,
       email,
-      password: hash,
+      password: hashedPassword,
     });
-    return res.status(200).send({
-      data: {
-        name, about, avatar, email,
-      },
-    });
+    return res.send(user);
   } catch (err) {
     if (err.name === 'ValidationError') {
-      return next(new ErrorBad('Ошибка валидации'));
+      return next(new ErrorBad('Переданы невалидные данные'));
     }
     if (err.code === 11000) {
       return next(new ErrorConflict('Пользователь с таким email уже зарегистрирован 5'));
@@ -120,13 +118,31 @@ const getUserInfo = async (req, res, next) => {
   }
 };
 
-const login = (req, res, next) => {
+const login = async (req, res, next) => {
   const { email, password } = req.body;
-  return User.findUserByCredentials(email, password)
-    .then((user) => {
-      const token = jwt.sign({ _id: user._id.toString() }, 'some-secret-key', { expiresIn: '7d' });
-      res.send({ token });
-    }).catch(next);
+
+  try {
+    const user = await User.findOne({ email }).select('+password');
+    if (!user) {
+      return next(new ErrorUnauthorized('Неверно ведена почта или пароль'));
+    }
+    const userValid = await bcrypt.compare(password, user.password);
+    if (!userValid) {
+      return next(new ErrorUnauthorized('Неверно ведена почта или пароль'));
+    }
+
+    const token = jwt.sign({
+      _id: user._id,
+    }, 'secret-key');
+    res.cookie('jwt', token, {
+      maxAge: 3600000,
+      httpOnly: true,
+      sameSite: true,
+    });
+    return res.status(200).send(user.toJSON());
+  } catch (error) {
+    return next(new ErrorServer('Ошибка на сервере'));
+  }
 };
 
 module.exports = {

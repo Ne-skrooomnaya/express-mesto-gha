@@ -33,14 +33,13 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
-app.post('/signup', express.json(), registerValidation, createUser);
-app.post('/signin', express.json(), authValidation, login);
+app.post('/signin', authValidation, login);
+app.post('/signup', registerValidation, createUser);
 
 app.use('/', auth, UserRoutes);
 app.use('/', auth, CardRoutes);
-app.use('/', (req, res, next) => {
-  res.status(ErrorNot).send({ message: 'Страница не найдена 3' });
-  next();
+app.use('*', (req, res, next) => {
+  next(new ErrorNot('Страница не найдена 5'));
 });
 
 app.use(errors());
