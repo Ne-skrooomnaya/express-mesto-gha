@@ -38,7 +38,7 @@ app.post('/signup', registerValidation, createUser);
 
 app.use('/', auth, UserRoutes);
 app.use('/', auth, CardRoutes);
-app.use('/', (req, res, next) => {
+app.use('*', (req, res, next) => {
   next(new ErrorNot('Страница не найдена 5'));
 });
 
