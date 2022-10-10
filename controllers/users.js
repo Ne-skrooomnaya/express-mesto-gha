@@ -25,15 +25,16 @@ const createUser = async (req, res, next) => {
     about,
     avatar,
     email,
+    password,
   } = req.body;
   try {
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    const hash = await bcrypt.hash(password, 10);
     const user = await User.create({
       name,
       about,
       avatar,
       email,
-      password: hashedPassword,
+      password: hash,
     });
     return res.send(user);
   } catch (err) {
