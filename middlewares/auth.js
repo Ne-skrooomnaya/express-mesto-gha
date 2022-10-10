@@ -10,7 +10,7 @@ const auth = (req, res, next) => {
   let payload;
 
   try {
-    payload = jwt.verify(token, 'SECRET');
+    payload = jwt.verify(token, 'some-secret-key');
   } catch (err) {
     next(new ErrorUnauthorized('Ошибка при авторизации'));
   }
