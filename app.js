@@ -1,11 +1,11 @@
 const express = require('express');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const { errors } = require('celebrate');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const { authValidation, registerValidation } = require('./middlewares/validation');
-const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
+const SignRoutes = require('./routes/sign');
 const UserRoutes = require('./routes/users');
 const CardRoutes = require('./routes/cards');
 const { ErrorNot } = require('./utils/ErrorNot');
@@ -31,14 +31,12 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.json());
+app.use(cookieParser());
 
-app.post('/signin', authValidation, login);
-app.post('/signup', registerValidation, createUser);
-
+app.use('/', SignRoutes);
 app.use('/', auth, UserRoutes);
 app.use('/', auth, CardRoutes);
-app.use('*', (req, res, next) => {
+app.use('*', auth, (req, res, next) => {
   next(new ErrorNot('Страница не найдена 5'));
 });
 

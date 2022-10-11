@@ -76,7 +76,7 @@ const updateUserInfo = async (req, res, next) => {
     if (!user) {
       return next(new ErrorNot('Такого пользователя не существует 1'));
     }
-    res.status(200).send(user);
+    res.send(user);
   } catch (err) {
     if (err.name === 'ValidationError') {
       return next(new ErrorBad('Ошибка валидации'));
@@ -96,7 +96,7 @@ const updateUserAvatar = async (req, res, next) => {
     if (!user) {
       return next(new ErrorNot('Такого пользователя не существует 1'));
     }
-    res.status(200).send(user);
+    res.send(user);
   } catch (err) {
     if (err.name === 'ValidationError') {
       return next(new ErrorBad('Ошибка валидации'));
@@ -112,7 +112,7 @@ const getUserInfo = async (req, res, next) => {
     if (!user) {
       return next(new ErrorNot('Такого пользователя не существует 1'));
     }
-    return res.status(200).send(user);
+    return res.send(user);
   } catch (err) {
     return next(new ErrorServer('Ошибка на сервере'));
   }
@@ -131,9 +131,11 @@ const login = async (req, res, next) => {
       return next(new ErrorUnauthorized('Неверно ведена почта или пароль'));
     }
 
-    const token = jwt.sign({
-      _id: user._id,
-    }, 'secret-key');
+    const token = jwt.sign(
+      { _id: user._id },
+      'secret-key',
+      { expiresIn: '7d' },
+    );
     res.cookie('jwt', token, {
       maxAge: 3600000,
       httpOnly: true,

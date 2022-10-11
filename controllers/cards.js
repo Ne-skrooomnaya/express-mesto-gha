@@ -10,7 +10,7 @@ const { ErrorServer } = require('../utils/ErrorServer');
 const getCards = async (req, res, next) => {
   try {
     const cards = await Card.find({});
-    return res.status(200).send(cards);
+    return res.send(cards);
   } catch (err) {
     return next(new ErrorServer('Ошибка на сервере'));
   }
@@ -21,7 +21,7 @@ const createCard = async (req, res, next) => {
   const owner = req.user._id;
   try {
     const card = await Card.create({ name, link, owner });
-    return res.status(200).send({ card });
+    return res.send({ card });
   } catch (err) {
     if (err.name === 'ValidationError') {
       return next(new ErrorBad('Ошибка валидации'));
@@ -34,7 +34,7 @@ const deleteCardId = async (req, res, next) => {
   const { cardId } = req.params;
   const owner = req.user._id;
   try {
-    const card = await Card.findByIdAndRemove(cardId);
+    const card = await Card.findById(cardId);
     if (!card) {
       return next(new ErrorNot('Карточка с указанным _id не найдена.'));
     }
@@ -42,7 +42,7 @@ const deleteCardId = async (req, res, next) => {
       return next(new ErrorForbidden('Вы не можете удалить чужую карточку'));
     }
     await Card.findByIdAndRemove(cardId);
-    return res.status(200).send({ message: 'карточка удалена' });
+    return res.send({ message: 'карточка удалена' });
   } catch (err) {
     if (err.name === 'CastError') {
       return next(new ErrorBad('Ошибка валидации'));
@@ -62,7 +62,7 @@ const likeCard = async (req, res, next) => {
     if (!card) {
       return next(new ErrorNot('Карточка с указанным _id не найдена.'));
     }
-    return res.status(200).send(card);
+    return res.send(card);
   } catch (err) {
     if (err.kind === 'ObjectId') {
       return next(new ErrorBad('Ошибка валидации'));
@@ -82,7 +82,7 @@ const dislikeCard = async (req, res, next) => {
     if (!card) {
       return next(new ErrorNot('Карточка с указанным _id не найдена.'));
     }
-    return res.status(200).send(card);
+    return res.send(card);
   } catch (err) {
     if (err.name === 'CastError') {
       return next(new ErrorBad('Ошибка валидации'));
